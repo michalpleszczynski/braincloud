@@ -1,0 +1,31 @@
+<!-- update.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="{{STATIC_URL}}blog.css" rel="stylesheet" type="text/css">
+  </head> 
+  <body>
+    <h1>Braincloud - Update Thought</h1>
+    <form method="post" action="http://127.0.0.1:8000/update/">
+      {% csrf_token %}
+      <ul>
+        <li><input type="hidden" name="id" value="{{thought.id}}"></li>
+        <li>
+          <input type="text" name="title" placeholder="Thought Title" 
+             value="{{thought.title}}" required>
+          <input type="text" name="last_update" 
+             value="{{thought.last_update}}" required>
+        </li>
+        <li>
+          <textarea name="content" placeholder="Enter Content" 
+            rows=5 cols=50 required>
+            {{thought.content}}
+          </textarea>
+        </li>
+        <li>
+          <input type="submit" value="Save Changes">
+        </li>
+      </ul>
+    </form>
+  </body>
+</html>

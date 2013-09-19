@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Your thoughts{% endblock %}
+
+{% block content %}
+	<!-- Cycle through entries -->
+	{% for thought in thoughts %}
+		<h2> {{ thought.title }} </h2>
+		<p>{{ thought.last_update }}</p>
+		<p>{{ thought.content }}</p>
+		<ul>
+		{% for tag in thought.tags %}
+			<li>{{ tag }}</li>
+		{% endfor %}
+		</ul>
+	{% endfor %}
+{% endblock %}

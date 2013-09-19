@@ -1,0 +1,33 @@
+div {
+	margin 5px;
+}
+
+div#top,div#middle,div#bottom {
+	width: 1400px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+div#middle, div#left, div#content {
+	height: 500px;
+}
+
+div#top {
+	height: 115px;
+}
+
+div#left {
+	float: left;
+	background-color: #ece3a5;
+	width: 190px;
+}
+
+div#content {
+	background-color: #c2dfef;;
+	float: right;
+	width: 1200px;
+}
+
+div#bottom {
+	background-color: #dddddd;
+}
