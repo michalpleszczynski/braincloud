@@ -5,3 +5,11 @@ nav#user_navigation{
 section#top_user_section{
 	float: right;
 }
+
+a#new_thought_link{
+	float: right;
+}
+
+.underline{
+	text-decoration: underline;
+}

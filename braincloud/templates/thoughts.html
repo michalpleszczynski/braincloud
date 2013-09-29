@@ -3,9 +3,12 @@
 {% block title %}Your thoughts{% endblock %}
 
 {% block content %}
+	<a href="{% url add_thought %}" id="new_thought_link">Add new thought</a>
 	<!-- Cycle through entries -->
 	{% for thought in thoughts %}
-		<h2> {{ thought.title }} </h2>
+		<h2 class="underline">{{ thought.title }}</h2>
+		<a href="{% url edit_thought thought.id %}">Edit</a>
+		<a href="{% url delete_thought thought.id %}">Delete</a>
 		<p>{{ thought.last_update }}</p>
 		<p>{{ thought.content }}</p>
 		<ul>
