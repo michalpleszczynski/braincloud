@@ -10,6 +10,8 @@ def add_tags(tags):
 def remove_tags(tags):
     for tag in tags:
         Tag.objects(name=tag).update_one(inc__counter=-1, upsert = False)
+    # remove all the unused tags
+    Tag.objects(counter=0).delete()
     return tags
 
 def update_tags(old_tags, new_tags):
@@ -20,7 +22,8 @@ def update_tags(old_tags, new_tags):
     # remove them from both sets
     new_tags -= common
     old_tags -= common
+
     # add new and remove old
     add_tags(new_tags)
     remove_tags(old_tags)
-    
+        

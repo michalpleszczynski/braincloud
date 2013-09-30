@@ -7,9 +7,7 @@ from tagcloud import services
 
 from .models import *
 from .forms import ThoughtForm
-
-
-# TODO: next thing - handle tags through signals not calls to tagcloud.service
+from .signals import *
 
 
 def list_thoughts(request):
@@ -22,7 +20,7 @@ def add(request):
         form = ThoughtForm(request.POST)
         if form.is_valid():
             new_thought = form.get_thought()
-            services.add_tags(new_thought.tags)
+            add_tags_signal.send(sender = Thought, tags = new_thought.tags)
             new_thought.save()
             return HttpResponseRedirect(reverse('home'))
     else:
@@ -39,7 +37,7 @@ def edit(request, id):
             # update field values and save to mongo
             new_thought = form.get_thought()
             new_thought.id = thought.id
-            services.update_tags(thought.tags, new_thought.tags)
+            update_tags_signal.send(sender = Thought, old_tags = thought.tags, new_tags = new_thought.tags.copy())
             new_thought.save()
             return HttpResponseRedirect(reverse('home'))
     else:
@@ -52,6 +50,7 @@ def delete(request, id):
     thought = Thought.objects.get(id=id)
     
     if request.method == 'POST':
+        remove_tags_signal.send(sender = Thought, tags = thought.tags)
         thought.delete()
         params = {'thoughts':Thought.objects.all()}
         template = 'thoughts.html' 

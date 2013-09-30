@@ -1,4 +1,11 @@
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+
 from mongoengine import *
+
+from tagcloud import services
+
+from .signals import *
 
 # add Set to mongoengine, move it somewhere else later
 class SetField(ListField):
@@ -31,3 +38,15 @@ class Thought(Document):
     
     def get_tags_as_string(self):
         return ', '.join(self.tags)
+    
+@receiver(update_tags_signal)
+def update_tags(sender, **kwargs):
+    services.update_tags(kwargs['old_tags'], kwargs['new_tags'])
+
+@receiver(add_tags_signal)    
+def add_tags(sender, **kwargs):
+    services.add_tags(kwargs['tags'])
+    
+@receiver(remove_tags_signal)
+def remove_tags(sender, **kwargs):
+    services.remove_tags(kwargs['tags'])
