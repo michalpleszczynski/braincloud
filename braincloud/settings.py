@@ -151,3 +151,13 @@ LOGGING = {
         },
     }
 }
+
+# Mongoengine settings
+
+# use mongoengine authentication
+AUTHENTICATION_BACKENDS = (
+    'mongoengine.django.auth.MongoEngineBackend',
+)
+
+# use mongoengine sessions
+SESSION_ENGINE = 'mongoengine.django.sessions'
