@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import patterns, include, url
+from django.contrib.auth.views import login, logout
 
 from brainblog.views import *
 
@@ -11,7 +12,8 @@ urlpatterns = patterns('',
     url(r'^add/$', add, name="add_thought"),
     url(r'^edit/(?P<id>\w+)$', edit, name="edit_thought"),
     url(r'^delete/(?P<id>\w+)$', delete, name="delete_thought"),
-
+    url(r'^accounts/login/$', login),
+    url(r'^accounts/logout/$', logout),
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

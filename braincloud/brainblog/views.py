@@ -2,6 +2,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
 
 from tagcloud import services
 
@@ -15,6 +16,7 @@ def list_thoughts(request):
     return render_to_response('thoughts.html', {'thoughts' : thoughts},
                               context_instance=RequestContext(request))
 
+@login_required
 def add(request):
     if request.method == 'POST':
         form = ThoughtForm(request.POST)

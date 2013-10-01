@@ -22,14 +22,11 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASES = {
-    'default': {'ENGINE': 'django.db.backends.dummy'}             
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(PROJECT_PATH, 'dev.db'),
+    }
 }
-
-AUTHENTICATION_BACKENDS = (
-    'mongoengine.django.auth.MongoEngineBackend',
-)
-
-SESSION_ENGINE = 'mongoengine.django.sessions'
 
 # connect to mongo
 connect(DBNAME)
@@ -85,9 +82,6 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
-
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = '%&@^yp61u2jg&ko56+jqny$gcrtl_1a_^fimgyar=k7%e$szl('
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -152,12 +146,4 @@ LOGGING = {
     }
 }
 
-# Mongoengine settings
-
-# use mongoengine authentication
-AUTHENTICATION_BACKENDS = (
-    'mongoengine.django.auth.MongoEngineBackend',
-)
-
-# use mongoengine sessions
-SESSION_ENGINE = 'mongoengine.django.sessions'
+from local_settings import *
