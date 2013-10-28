@@ -1,22 +1,20 @@
 from django.conf.urls.defaults import patterns, include, url
-from django.contrib.auth.views import login, logout
+from django.contrib import admin
 
 from brainblog.views import *
 
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', list_thoughts, name="home"),
+    url(r'^$', home, name="home"),
+    url(r'^thoughts/$', list_thoughts, name="list_thoughts"),
     url(r'^add/$', add, name="add_thought"),
     url(r'^edit/(?P<id>\w+)$', edit, name="edit_thought"),
     url(r'^delete/(?P<id>\w+)$', delete, name="delete_thought"),
     url(r'^accounts/login/$', login),
-    url(r'^accounts/logout/$', logout),
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^accounts/logout/$', logout, {'next_page':'/'}, name="logout"),
+    url(r'^accounts/register/$', register, name="register"),
 
-    # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^admin/', include(admin.site.urls)),
 )

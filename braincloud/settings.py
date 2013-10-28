@@ -1,6 +1,10 @@
 import os
 
-from mongoengine import connect
+from datetime import timedelta
+
+from mongoengine import register_connection
+
+#from mongoengine import register_connection
 
 # Django settings for braincloud project.
 
@@ -12,8 +16,13 @@ STATICFILES_DIRS = (os.path.join(CURRENT_DIR, 'static'),)
 PROJECT_NAME = 'braincloud'
 DBNAME = 'braincloud'
 
+# register default connection with mongo
+register_connection('braincloud','braincloud')
+
+# for development purposes
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -28,8 +37,8 @@ DATABASES = {
     }
 }
 
-# connect to mongo
-connect(DBNAME)
+# connect to Mongo - mongoengine needs a connection with alias 'default'
+#register_connection(name = DBNAME, alias = 'default')
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/{{ docs_version }}/ref/settings/#allowed-hosts
@@ -116,11 +125,11 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+    'django.contrib.admin',
+    'django.contrib.admindocs',
     'braincloud.brainblog',
+    'djcelery',
+    'kombu.transport.django',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -144,6 +153,17 @@ LOGGING = {
             'propagate': True,
         },
     }
+}
+
+import djcelery
+djcelery.setup_loader()
+BROKER_URL = 'django://'
+
+CELERYBEAT_SCHEDULE = {
+    "runs-every-24-hours": {
+        "task": "tasks.clear_expired_sessions",
+        "schedule": timedelta(hours=24),
+    },
 }
 
 from local_settings import *

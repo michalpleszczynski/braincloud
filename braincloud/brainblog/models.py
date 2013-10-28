@@ -1,5 +1,6 @@
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, pre_delete
 from django.dispatch import receiver
+from django.contrib.sessions.models import Session
 
 from mongoengine import *
 
@@ -36,17 +37,27 @@ class Thought(Document):
     last_update = DateTimeField(required = True)
     tags = SetField(StringField(max_length = 30))
     
+    meta = {"db_alias": "braincloud"}
+    
     def get_tags_as_string(self):
         return ', '.join(self.tags)
+
+@receiver(pre_delete, sender = Session)
+def sessionend_handler(sender, **kwargs):
+    print "session %s ended" % kwargs.get('instance').session_key
+
+@receiver(pre_save, sender = Session)
+def sessionstart_handler(sender, **kwargs):
+    print "session %s created" % kwargs.get('instance').session_key
     
 @receiver(update_tags_signal)
 def update_tags(sender, **kwargs):
-    services.update_tags(kwargs['old_tags'], kwargs['new_tags'])
+    services.update_tags(sender, kwargs['old_tags'], kwargs['new_tags'])
 
 @receiver(add_tags_signal)    
 def add_tags(sender, **kwargs):
-    services.add_tags(kwargs['tags'])
+    services.add_tags(sender, kwargs['tags'])
     
 @receiver(remove_tags_signal)
 def remove_tags(sender, **kwargs):
-    services.remove_tags(kwargs['tags'])
+    services.remove_tags(sender, kwargs['tags'])

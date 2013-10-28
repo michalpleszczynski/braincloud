@@ -1,6 +1,7 @@
 import datetime
 
-from django.forms import Form, CharField, Textarea
+from django.forms import Form, CharField, Textarea, EmailField
+from django.contrib.auth.forms import UserCreationForm
 
 from .models import Thought
 
@@ -17,3 +18,6 @@ class ThoughtForm(Form):
         thought.tags = [item.strip() for item in self.cleaned_data['tags'].split(",")]
         thought.last_update = datetime.datetime.now()
         return thought
+    
+class UserRegistrationForm(UserCreationForm):
+    email = EmailField()

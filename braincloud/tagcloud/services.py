@@ -1,20 +1,14 @@
-from .models import Tag
+from .daos import *
 
 # point of access to tags from other apps
 
-def add_tags(tags):
-    for tag in tags:
-        Tag.objects(name=tag).update_one(inc__counter=1, upsert = True)
-    return tags
+def add_tags(db_name, tags):
+    TagDao.create_or_update(tags, db_name)
 
-def remove_tags(tags):
-    for tag in tags:
-        Tag.objects(name=tag).update_one(inc__counter=-1, upsert = False)
-    # remove all the unused tags
-    Tag.objects(counter=0).delete()
-    return tags
+def remove_tags(db_name, tags):
+    TagDao.decrement_and_remove(tags, db_name)
 
-def update_tags(old_tags, new_tags):
+def update_tags(db_name, old_tags, new_tags):
     if old_tags == new_tags:
         return
     # extract common tags
@@ -24,6 +18,6 @@ def update_tags(old_tags, new_tags):
     old_tags -= common
 
     # add new and remove old
-    add_tags(new_tags)
-    remove_tags(old_tags)
+    add_tags(db_name, new_tags)
+    remove_tags(db_name, old_tags)
         
