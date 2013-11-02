@@ -15,13 +15,22 @@ from math import log
 #             tags[domain] = count
 #     return tags
 
+
 def calculate_sizes(tag_dict, threshold = 1, min_size = 1, max_size = 10):
+    """
+    Calculate sizes of specific tags in a tag cloud.
+        @param tag_dict Python dictionary with a tag name as a key and integer counter value.
+        @param threshold Positive number specifying a minimal tag counter value taken under consideration. Tags with
+               lower counters will not be included in resulting dictionary.
+        @param min_size Minimum size of a tag.
+        @param max_size Maximum size of a tag.
+    """
     min_count, max_count = min(tag_dict.values()), max(tag_dict.values())
     min_count = threshold if threshold > min_count else min_count
-    constant = log(max_count - min_count)/(max_size - min_size)
+    constant = log(max_count - min_count) / (max_size - min_size)
     tag_size = {}
     for tag, count in tag_dict.iteritems():
         if count >= threshold:
-            tag_size[tag] = min_size + log(count - min_count)/constant
+            tag_size[tag] = min_size + log(count - min_count or 1) / constant
     return tag_size
     

@@ -2,7 +2,7 @@ import os
 
 from datetime import timedelta
 
-from mongoengine import register_connection
+from mongoengine import connect
 
 #from mongoengine import register_connection
 
@@ -17,9 +17,8 @@ PROJECT_NAME = 'braincloud'
 DBNAME = 'braincloud'
 
 # register default connection with mongo
-register_connection('braincloud','braincloud')
+connect(DBNAME)
 
-# for development purposes
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
@@ -36,9 +35,6 @@ DATABASES = {
         'NAME': os.path.join(PROJECT_PATH, 'dev.db'),
     }
 }
-
-# connect to Mongo - mongoengine needs a connection with alias 'default'
-#register_connection(name = DBNAME, alias = 'default')
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/{{ docs_version }}/ref/settings/#allowed-hosts

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Your tag cloud{% endblock %}
+
+{% block content %}
+    <p>
+        {% for tag, size in tags.items %}
+            <a href="{% url thoughts_by_tag tag %}" style="font-size:{{ size }}em">{{ tag }}</a>,&nbsp
+        {% endfor %}
+    </p>
+{% endblock %}

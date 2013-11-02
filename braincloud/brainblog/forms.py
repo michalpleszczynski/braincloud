@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 
 from .models import Thought
 
+
 class ThoughtForm(Form):
     title = CharField(max_length = 120)
     content = CharField(max_length = 1000, widget = Textarea)
@@ -18,6 +19,7 @@ class ThoughtForm(Form):
         thought.tags = [item.strip() for item in self.cleaned_data['tags'].split(",")]
         thought.last_update = datetime.datetime.now()
         return thought
-    
+
+
 class UserRegistrationForm(UserCreationForm):
     email = EmailField()
