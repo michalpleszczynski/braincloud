@@ -1,12 +1,19 @@
+import logging
+
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 
+from braincloud.brainblog.tasks import create_user_tags, recalculate_cloud
 from .forms import *
 from .models import *
 from .utils import calculate_sizes
+
+
+logger = logging.getLogger(__name__)
 
 
 def home(request):
@@ -18,11 +25,9 @@ def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            new_user = form.save()
+            form.save()
             # create tag holder for the new user
-            user_tags = UserTags
-            user_tags.author = new_user.username
-            user_tags.save()
+            create_user_tags.delay(request.user.username)
             return HttpResponseRedirect(reverse('list_thoughts'))
     else:
         form = UserRegistrationForm()
@@ -41,6 +46,14 @@ def list_thoughts(request, tag = None):
 
 
 @login_required
+def view_thought(request, id):
+    thought = Thought.objects.get(id=id)
+
+    return render_to_response('view_thought.html', {'thought': thought},
+                              context_instance = RequestContext(request))
+
+
+@login_required
 def add(request):
     if request.method == 'POST':
         form = ThoughtForm(request.POST)
@@ -49,11 +62,12 @@ def add(request):
             new_thought.author = request.user.username
             add_tags_signal.send(sender=request.user.username, tags=new_thought.tags)
             new_thought.save()
+            recalculate_cloud.delay(request.user.username)
             return HttpResponseRedirect(reverse('list_thoughts'))
     else:
         form = ThoughtForm()
     return render_to_response('add.html', {'thought_form': form},
-                              context_instance=RequestContext(request))
+                              context_instance = RequestContext(request))
 
 
 @login_required
@@ -69,6 +83,7 @@ def edit(request, id):
             update_tags_signal.send(sender=request.user.username, old_tags=thought.tags,
                                     new_tags=new_thought.tags)
             new_thought.save()
+            recalculate_cloud.delay(request.user.username)
             return HttpResponseRedirect(reverse('list_thoughts'))
     else:
         form = ThoughtForm(initial={'title': thought.title, 'content': thought.content,
@@ -84,6 +99,7 @@ def delete(request, id):
     if request.method == 'POST':
         remove_tags_signal.send(sender=request.user.username, tags=thought.tags)
         thought.delete()
+        recalculate_cloud.delay(request.user.username)
         params = {'thoughts': Thought.objects.filter(author=request.user.username)}
         template = 'thoughts.html'
     elif request.method == 'GET':
@@ -95,7 +111,11 @@ def delete(request, id):
 
 @login_required
 def cloud(request):
-    tag_dict = UserTags.objects.get(author = request.user.username).tags
-    tag_size_dict = calculate_sizes(tag_dict, min_size=0.5, max_size=1.5)
+    tag_size_dict = cache.get('tag_size_dict')
+    if not tag_size_dict:
+        logger.info('tag_size_dict not in cache')
+        tag_dict = UserTags.objects.get(author = request.user.username).tags
+        tag_size_dict = calculate_sizes(tag_dict, 1, min_size=0.5, max_size=1.5)
+        cache.set('tag_size_dict', tag_size_dict)
     return render_to_response('cloud.html', {'tags': tag_size_dict},
                               context_instance= RequestContext(request))

@@ -1,10 +1,13 @@
 {% extends "base.html" %}
 
+{% load pagination_tags %}
+
 {% block title %}Your thoughts{% endblock %}
 
 {% block content %}
 	<a href="{% url add_thought %}" id="new_thought_link">Add new thought</a>
 	<!-- Cycle through entries -->
+    {% autopaginate thoughts 3 %}
 	{% for thought in thoughts %}
 		<h2 class="underline">{{ thought.title }}</h2>
 		<a href="{% url edit_thought thought.id %}">Edit</a>
@@ -17,4 +20,5 @@
 		{% endfor %}
 		</ul>
 	{% endfor %}
+    {% paginate %}
 {% endblock %}

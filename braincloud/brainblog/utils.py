@@ -16,7 +16,7 @@ from math import log
 #     return tags
 
 
-def calculate_sizes(tag_dict, threshold = 1, min_size = 1, max_size = 10):
+def calculate_sizes(tag_dict, threshold, min_size, max_size):
     """
     Calculate sizes of specific tags in a tag cloud.
         @param tag_dict Python dictionary with a tag name as a key and integer counter value.

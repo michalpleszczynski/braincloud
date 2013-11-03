@@ -2,11 +2,20 @@ from django.conf.urls.defaults import patterns, include, url
 from django.contrib import admin
 from django.contrib.auth.views import login, logout
 
+from tastypie.api import Api
+
 from brainblog.views import *
+from brainblog.restapi.resources import UserResource
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
+# rest api
+rest_api = Api(api_name = 'rest')
+rest_api.register(UserResource())
+#rest_api.register(ThoughtResource())
+
+urlpatterns = patterns(
+    '',
     url(r'^$', home, name="home"),
 
     # thoughts
@@ -27,4 +36,7 @@ urlpatterns = patterns('',
     # admin
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
+
+    # rest api
+    url(r'^api/', include(rest_api.urls)),
 )
