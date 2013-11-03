@@ -17,14 +17,6 @@ class SetField(ListField):
             self.error('Only sets may be used.')    
 
 
-#class Tag(EmbeddedDocument):
-#    name = StringField(primary_key = True, max_length = 30, unique = True)
-#    counter = IntField()
-#
-#    def __unicode__(self):
-#        return "%s: %d" % (self.name, self.counter)
-
-
 class UserTags(Document):
     author = StringField(primary_key = True, unique = True)
     tags = MapField(IntField())

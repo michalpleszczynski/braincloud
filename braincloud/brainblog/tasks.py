@@ -24,6 +24,6 @@ def create_user_tags(username):
 
 @task(ignore_result = True)
 def recalculate_cloud(username):
-    tag_dict = UserTags.objects.get(author = username).tags
+    tag_dict = UserTags.objects.get_or_create(author = username)[0].tags
     tag_size_dict = calculate_sizes(tag_dict, 1, min_size=0.5, max_size=1.5)
     cache.set('tag_size_dict', tag_size_dict)

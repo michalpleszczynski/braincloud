@@ -16,7 +16,7 @@ class ThoughtForm(Form):
             # throw exception?
             pass
         thought = Thought(title = self.cleaned_data['title'], content = self.cleaned_data['content'])
-        thought.tags = [item.strip() for item in self.cleaned_data['tags'].split(",")]
+        thought.tags = set(item.strip() for item in self.cleaned_data['tags'].split(","))
         thought.last_update = datetime.datetime.now()
         return thought
 

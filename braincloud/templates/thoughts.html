@@ -9,15 +9,15 @@
 	<!-- Cycle through entries -->
     {% autopaginate thoughts 3 %}
 	{% for thought in thoughts %}
-		<h2 class="underline">{{ thought.title }}</h2>
+		<h2 class="underline"><a href="{% url view_thought thought.id %}">{{ thought.title }}</a></h2>
 		<a href="{% url edit_thought thought.id %}">Edit</a>
 		<a href="{% url delete_thought thought.id %}">Delete</a>
 		<p>{{ thought.last_update }}</p>
 		<p>{{ thought.content }}</p>
 		<ul>
-		{% for tag in thought.tags %}
-			<li>{{ tag }}</li>
-		{% endfor %}
+            {% for tag in thought.tags %}
+                <li><a href="{% url thoughts_by_tag tag %}">{{ tag }}</a></li>
+            {% endfor %}
 		</ul>
 	{% endfor %}
     {% paginate %}

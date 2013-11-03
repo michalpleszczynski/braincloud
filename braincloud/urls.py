@@ -20,7 +20,8 @@ urlpatterns = patterns(
 
     # thoughts
     url(r'^thoughts/$', list_thoughts, name="list_thoughts"),
-    url(r'^thoughts/(?P<tag>\w+)$', list_thoughts, name="thoughts_by_tag"),
+    url(r'^thoughts/(?P<tag>.+)/$', list_thoughts, name="thoughts_by_tag"),
+    url(r'^view_thought/(?P<id>\w+)$', view_thought, name="view_thought"),
     url(r'^add/$', add, name="add_thought"),
     url(r'^edit/(?P<id>\w+)$', edit, name="edit_thought"),
     url(r'^delete/(?P<id>\w+)$', delete, name="delete_thought"),

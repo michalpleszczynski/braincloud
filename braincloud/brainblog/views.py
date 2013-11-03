@@ -40,6 +40,8 @@ def list_thoughts(request, tag = None):
     if not tag:
         thoughts = Thought.objects.filter(author = request.user.username)
     else:
+        # workaround for tags with whitespace in them
+        tag = tag.replace('/', ' ')
         thoughts = Thought.objects.filter(author = request.user.username, tags__contains = tag)
     return render_to_response('thoughts.html', {'thoughts': thoughts},
                               context_instance = RequestContext(request))
@@ -114,7 +116,7 @@ def cloud(request):
     tag_size_dict = cache.get('tag_size_dict')
     if not tag_size_dict:
         logger.info('tag_size_dict not in cache')
-        tag_dict = UserTags.objects.get(author = request.user.username).tags
+        tag_dict = UserTags.objects.get_or_create(author = request.user.username)[0].tags
         tag_size_dict = calculate_sizes(tag_dict, 1, min_size=0.5, max_size=1.5)
         cache.set('tag_size_dict', tag_size_dict)
     return render_to_response('cloud.html', {'tags': tag_size_dict},
