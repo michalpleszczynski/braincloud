@@ -2,10 +2,53 @@
 
 {% block title %}Your tag cloud{% endblock %}
 
+{% block extrahead %}
+    <link href="{{STATIC_URL}}css/cloud.css" rel="stylesheet">
+    <script src="{{ STATIC_URL }}js/d3-cloud/lib/d3/d3.js"></script>
+    <script src="{{ STATIC_URL }}js/d3-cloud/d3.layout.cloud.js"></script>
+{% endblock %}
+
 {% block content %}
-    <p>
-        {% for tag, size in tags.items %}
-            <a href="{% url thoughts_by_tag tag %}" style="font-size:{{ size }}em">{{ tag }}</a>,&nbsp
-        {% endfor %}
-    </p>
+
+<div id="cloud">
+    <script>
+          var fill = d3.scale.category20();
+
+          var words_array = new Array();
+          {% for tag, size in tags.items %}
+            words_array.push({text:'{{ tag }}', size:{{ size }}});
+          {% endfor %}
+
+          d3.layout.cloud().size([document.getElementById('cloud').offsetWidth, document.getElementById('cloud').offsetHeight])
+              .words(words_array)
+              .padding(5)
+              .rotate(function() { return ~~(Math.random() * 2) * 90; })
+              .font("Impact")
+              .fontSize(function(d) { return d.size; })
+              .on("end", draw)
+              .start();
+
+          function draw(words) {
+            d3.select("#cloud").append("svg")
+                .attr("width", document.getElementById('cloud').offsetWidth)
+                .attr("height", document.getElementById('cloud').offsetHeight)
+              .append("g")
+                .attr("transform", "translate(600,300)")
+              .selectAll("text")
+                .data(words)
+              .enter().append("a")
+                .attr("xlink:href", function(d) { return "/thoughts/" + d.text + "/" })
+              .append("text")
+                .style("font-size", function(d) { return d.size + "px"; })
+                .style("font-family", "Impact")
+                .style("fill", function(d, i) { return fill(i); })
+                .attr("text-anchor", "middle")
+                .attr("transform", function(d) {
+                  return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function(d) { return d.text; });
+          }
+
+    </script>
+</div>
 {% endblock %}

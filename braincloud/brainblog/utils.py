@@ -1,3 +1,5 @@
+import logging
+
 from random import randint
 from math import log
 
@@ -15,6 +17,8 @@ from math import log
 #             tags[domain] = count
 #     return tags
 
+logger = logging.getLogger(__name__)
+
 
 def calculate_sizes(tag_dict, threshold, min_size, max_size):
     """
@@ -25,6 +29,7 @@ def calculate_sizes(tag_dict, threshold, min_size, max_size):
         @param min_size Minimum size of a tag.
         @param max_size Maximum size of a tag.
     """
+    logger.info('min size: %d, max size: %d' % (min_size, max_size))
     min_count, max_count = min(tag_dict.values()), max(tag_dict.values())
     min_count = threshold if threshold > min_count else min_count
     constant = log(max_count - min_count or 1) / (max_size - min_size)

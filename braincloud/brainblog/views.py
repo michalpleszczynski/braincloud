@@ -1,4 +1,5 @@
 import logging
+import operator
 
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -8,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 
 from braincloud.brainblog.tasks import create_user_tags, recalculate_cloud
+from braincloud.settings import CLOUD_MAX_SIZE, CLOUD_MIN_SIZE, CLOUD_ITEMS
 from .forms import *
 from .models import *
 from .utils import calculate_sizes
@@ -116,8 +118,7 @@ def cloud(request):
     tag_size_dict = cache.get('tag_size_dict')
     if not tag_size_dict:
         logger.info('tag_size_dict not in cache')
-        tag_dict = UserTags.objects.get_or_create(author = request.user.username)[0].tags
-        tag_size_dict = calculate_sizes(tag_dict, 1, min_size=0.5, max_size=1.5)
+        tag_size_dict = recalculate_cloud(request.user.username)
         cache.set('tag_size_dict', tag_size_dict)
     return render_to_response('cloud.html', {'tags': tag_size_dict},
                               context_instance= RequestContext(request))

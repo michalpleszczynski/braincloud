@@ -4,6 +4,7 @@
 <head>
 	<link href="{{STATIC_URL}}css/layout.css" rel="stylesheet">
 	<link href="{{STATIC_URL}}css/main.css" rel="stylesheet">
+    {% block extrahead %}{% endblock %}
 	<title>{% block title %}{% endblock %}</title>
 </head>
 <body>

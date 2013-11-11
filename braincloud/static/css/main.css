@@ -1,12 +1,12 @@
+a {
+    text-decoration: none;
+}
+
 nav#user_navigation{
 	background-color: red;
 }
 
 section#top_user_section{
-	float: right;
-}
-
-a#new_thought_link{
 	float: right;
 }
 

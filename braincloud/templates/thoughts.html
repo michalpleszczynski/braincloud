@@ -2,6 +2,10 @@
 
 {% load pagination_tags %}
 
+{% block extrahead %}
+    <link href="{{STATIC_URL}}css/thought.css" rel="stylesheet">
+{% endblock %}
+
 {% block title %}Your thoughts{% endblock %}
 
 {% block content %}
@@ -9,16 +13,23 @@
 	<!-- Cycle through entries -->
     {% autopaginate thoughts 3 %}
 	{% for thought in thoughts %}
-		<h2 class="underline"><a href="{% url view_thought thought.id %}">{{ thought.title }}</a></h2>
-		<a href="{% url edit_thought thought.id %}">Edit</a>
-		<a href="{% url delete_thought thought.id %}">Delete</a>
-		<p>{{ thought.last_update }}</p>
-		<p>{{ thought.content }}</p>
-		<ul>
-            {% for tag in thought.tags %}
-                <li><a href="{% url thoughts_by_tag tag %}">{{ tag }}</a></li>
-            {% endfor %}
-		</ul>
+        <article class="thought_article">
+            <h2 class="underline"><a href="{% url view_thought thought.id %}">{{ thought.title }}</a></h2>
+            <a href="{% url delete_thought thought.id %}" class="delete_thought"><img src="{{STATIC_URL}}images/erase.png" alt="Delete thought"></a>
+            <a href="{% url edit_thought thought.id %}" class="edit_thought"><img src="{{STATIC_URL}}images/edit.png" alt="Edit thought"></a>
+            {% if post.body|wordcount <= 100 %}
+                <p>{{ thought.content }}</p>
+            {% else %}
+                <p>{{ thought.content|truncatewords:"100" }}</p>
+                <a href="{% url view_thought thought.id %}">Read more...</a>
+            {% endif %}
+            <ul>
+                {% for tag in thought.tags %}
+                    <div class="thought_tag"><a href="{% url thoughts_by_tag tag %}">{{ tag }}</a></div>
+                {% endfor %}
+            </ul>
+            <p class="thought_timestamp">{{ thought.last_update }}</p>
+        </article>
 	{% endfor %}
     {% paginate %}
 {% endblock %}

@@ -27,7 +27,7 @@ class UserTags(Document):
 
 class Thought(Document):
     author = StringField()
-    title = StringField(max_length = 120, required = True)
+    title = StringField(max_length = 60, required = True)
     content = StringField(max_length = 1000, required = True)
     last_update = DateTimeField(required = True)
     tags = SetField(StringField(max_length = 30))
