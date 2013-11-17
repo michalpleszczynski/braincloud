@@ -1,5 +1,4 @@
 import logging
-import operator
 
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -9,10 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 
 from braincloud.brainblog.tasks import create_user_tags, recalculate_cloud
-from braincloud.settings import CLOUD_MAX_SIZE, CLOUD_MIN_SIZE, CLOUD_ITEMS
 from .forms import *
 from .models import *
-from .utils import calculate_sizes
 
 
 logger = logging.getLogger(__name__)

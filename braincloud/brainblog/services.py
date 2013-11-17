@@ -5,14 +5,17 @@ from .models import UserTags
 
 def add_tags(username, tags):
     user_tags, created = UserTags.objects.get_or_create(author = username)
-    # if single string than make it a list to have a uniform logic for both
+    # if single string than make it a list to have the same logic for both
     if not is_collection(tags):
         tags = [tags]
+    # get only keys in the list, lookup in this list and then access the full list by index
+    tag_list = [i.keys()[0] for i in user_tags.tags]
     for tag in tags:
-        if tag in user_tags.tags:
-            user_tags.tags[tag] += 1
-        else:
-            user_tags.tags[tag] = 1
+        try:
+            index = tag_list.index(tag)
+            user_tags.tags[index][tag] += 1
+        except ValueError:
+            user_tags.tags.append({tag: 1})
     user_tags.save()
 
 
@@ -20,10 +23,13 @@ def remove_tags(username, tags):
     user_tags = UserTags.objects.get(author = username)
     if not is_collection(tags):
         tags = [tags]
+    # see add_tags
+    tag_list = [i.keys()[0] for i in user_tags.tags]
     for tag in tags:
-        user_tags.tags[tag] -= 1
-        if user_tags.tags[tag] == 0:
-            del user_tags.tags[tag]
+        index = tag_list.index(tag)
+        user_tags.tags[index][tag] -= 1
+        if user_tags.tags[index] == 0:
+            del user_tags.tags[index]
     user_tags.save()
 
 

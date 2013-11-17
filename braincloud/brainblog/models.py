@@ -1,5 +1,6 @@
 from mongoengine import *
 
+
 # add Set to mongoengine, move it somewhere else later
 class SetField(ListField):
     """ Extends ListField, so that's how it's represented in Mongo. """
@@ -14,15 +15,27 @@ class SetField(ListField):
 
     def validate(self, value):
         if not isinstance(value, set):
-            self.error('Only sets may be used.')    
+            self.error('Only sets may be used.')
 
 
-class UserTags(Document):
-    author = StringField(primary_key = True, unique = True)
-    tags = MapField(IntField())
+class MySortedListField(ListField):
 
-    def __unicode__(self):
-        return "%s" % self.author
+    _ordering = None
+    _order_reverse = False
+
+    def __init__(self, field, **kwargs):
+        if 'ordering' in kwargs.keys():
+            self._ordering = kwargs.pop('ordering')
+        if 'reverse' in kwargs.keys():
+            self._order_reverse = kwargs.pop('reverse')
+        super(MySortedListField, self).__init__(field, **kwargs)
+
+    def to_mongo(self, value):
+        value = super(MySortedListField, self).to_mongo(value)
+        if self._ordering is not None:
+            return sorted(value, key=self._ordering,
+                          reverse=self._order_reverse)
+        return sorted(value, reverse=self._order_reverse)
 
 
 class Thought(Document):
@@ -37,5 +50,14 @@ class Thought(Document):
 
     def __unicode__(self):
         return "%s by %s" % (self.title, self.author)
+
+
+class UserTags(Document):
+    author = StringField(primary_key=True, unique=True)
+    tags = MySortedListField(DictField(), ordering=lambda d: d.values(), reverse=True)
+
+    def __unicode__(self):
+        return "%s" % self.author
+
 
 from .receivers import *

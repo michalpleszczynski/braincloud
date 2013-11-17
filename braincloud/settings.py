@@ -130,6 +130,7 @@ INSTALLED_APPS = (
     'kombu.transport.django',
     'tastypie',
     'pagination',
+    'django_extensions',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -187,5 +188,11 @@ CELERYBEAT_SCHEDULE = {
         "schedule": timedelta(hours=24),
     },
 }
+
+# shell plus
+SHELL_PLUS_PRE_IMPORTS = (
+    ('brainblog.models', '*'),
+)
+
 
 from local_settings import *
