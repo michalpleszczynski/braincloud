@@ -4,14 +4,14 @@ from datetime import timedelta
 
 from mongoengine import connect
 
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
 #from mongoengine import register_connection
 
 # Django settings for braincloud project.
 
-PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
-CURRENT_DIR = os.path.dirname(__file__)
-TEMPLATE_DIRS = (os.path.join(CURRENT_DIR, 'templates'),)
-STATICFILES_DIRS = (os.path.join(CURRENT_DIR, 'static'),)
+TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 PROJECT_NAME = 'braincloud'
 DBNAME = 'braincloud'
@@ -32,7 +32,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(PROJECT_PATH, 'dev.db'),
+        'NAME': os.path.join(BASE_DIR, 'dev.db'),
     }
 }
 
@@ -125,7 +125,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    'braincloud.brainblog',
+    'brainblog',
+    'cloudtag',
     'djcelery',
     'kombu.transport.django',
     'tastypie',
@@ -192,7 +193,7 @@ CELERYBEAT_SCHEDULE = {
 # shell plus
 SHELL_PLUS_PRE_IMPORTS = (
     ('brainblog.models', '*'),
+    ('cloudtag.models', '*'),
 )
 
-
-from local_settings import *
+from conf.local_settings import *

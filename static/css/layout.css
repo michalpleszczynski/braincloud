@@ -9,7 +9,10 @@ div#top,div#middle,div#bottom {
 }
 
 div#middle, div#left, div#content {
-	height: 600px;
+	height: auto;
+	min-height: 400px;
+	height:auto !important;        /* for IE as it does not support min-height */
+    height: 400px;                   /* for IE as it does not support min-height */
 }
 
 div#top {

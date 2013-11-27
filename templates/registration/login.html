@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link href="{{STATIC_URL}}css/login.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}css/main.css" rel="stylesheet">
+    <title>BrainCloud - Hello!</title>
+</head>
+<body>
+<section id="form_section">
+	<form action="" method="post" id="login_form">
+	{% csrf_token %}
+		<input type="text" name="username" placeholder="username" id="username">
+		<input type="password" name="password" placeholder="password" id="password">
+        <label for="checkbox" id="remember_text">remember</label>
+        <input type="checkbox" id="checkbox" name="checkbox">
+        <input type="submit" value="login" />
+		<input type="hidden" name="next" value="{{ next|escape }}" />
+	</form>
+    {% if form.errors %}
+		<p class="error">Sorry, that's not a valid username or password.</p>
+	{% endif %}
+</section>
+{% include "includes/footer.html" %}
+</body>
+</html>

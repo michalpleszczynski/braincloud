@@ -7,7 +7,9 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 
-from braincloud.brainblog.tasks import create_user_tags, recalculate_cloud
+from cloudtag.models import UserTags
+from cloudtag.tasks import recalculate_cloud
+from cloudtag.signals import add_tags_signal, remove_tags_signal, update_tags_signal
 from .forms import *
 from .models import *
 
@@ -26,7 +28,9 @@ def register(request):
         if form.is_valid():
             form.save()
             # create tag holder for the new user
-            create_user_tags.delay(request.user.username)
+            new_user_tags = UserTags()
+            new_user_tags.author = request.user.username
+            new_user_tags.save()
             return HttpResponseRedirect(reverse('list_thoughts'))
     else:
         form = UserRegistrationForm()
@@ -112,10 +116,11 @@ def delete(request, id):
 
 @login_required
 def cloud(request):
-    tag_size_dict = cache.get('tag_size_dict')
+    username = request.user.username
+    tag_size_dict = cache.get(username + 'tag_size_dict')
     if not tag_size_dict:
         logger.info('tag_size_dict not in cache')
-        tag_size_dict = recalculate_cloud(request.user.username)
-        cache.set('tag_size_dict', tag_size_dict)
+        tag_size_dict = recalculate_cloud(username)
+        cache.set(username + 'tag_size_dict', tag_size_dict)
     return render_to_response('cloud.html', {'tags': tag_size_dict},
                               context_instance= RequestContext(request))

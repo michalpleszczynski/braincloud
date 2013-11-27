@@ -1,11 +1,11 @@
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.contrib.auth.views import login, logout
 
 from tastypie.api import Api
 
 from brainblog.views import *
-from brainblog.restapi.resources import UserResource
+from brainblog.api import UserResource
 
 admin.autodiscover()
 
@@ -16,7 +16,7 @@ rest_api.register(UserResource())
 
 urlpatterns = patterns(
     '',
-    url(r'^$', home, name="home"),
+    url(r'^home/$', home, name="home"),
 
     # thoughts
     url(r'^thoughts/$', list_thoughts, name="list_thoughts"),
@@ -27,7 +27,7 @@ urlpatterns = patterns(
     url(r'^delete/(?P<id>\w+)$', delete, name="delete_thought"),
 
     # cloud
-    url(r'cloud/$', cloud, name="cloud"),
+    url(r'^$', cloud, name="cloud"),
 
     # users
     url(r'^accounts/login/$', login),
