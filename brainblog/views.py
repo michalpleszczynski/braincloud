@@ -6,20 +6,18 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
+from django.utils import timezone
 
 from cloudtag.models import UserTags
 from cloudtag.tasks import recalculate_cloud
 from cloudtag.signals import add_tags_signal, remove_tags_signal, update_tags_signal
-from .forms import *
-from .models import *
+from .forms import ThoughtForm, UserRegistrationForm
+from .models import Thought
+from .tasks import index_operation
+from .index import CREATE, UPDATE, DELETE
 
 
 logger = logging.getLogger(__name__)
-
-
-def home(request):
-    return render_to_response('home.html',
-                              context_instance=RequestContext(request))
 
 
 def register(request):
@@ -31,6 +29,7 @@ def register(request):
             new_user_tags = UserTags()
             new_user_tags.author = request.user.username
             new_user_tags.save()
+
             return HttpResponseRedirect(reverse('list_thoughts'))
     else:
         form = UserRegistrationForm()
@@ -65,8 +64,10 @@ def add(request):
         if form.is_valid():
             new_thought = form.get_thought()
             new_thought.author = request.user.username
+            new_thought.pub_date = timezone.now()
             add_tags_signal.send(sender=request.user.username, tags=new_thought.tags)
             new_thought.save()
+            index_operation.delay(new_thought, CREATE)
             recalculate_cloud.delay(request.user.username)
             return HttpResponseRedirect(reverse('list_thoughts'))
     else:
@@ -85,9 +86,11 @@ def edit(request, id):
             # update field values and save to mongo
             new_thought = form.get_thought()
             new_thought.id = thought.id
+            new_thought.pub_date = thought.pub_date
             update_tags_signal.send(sender=request.user.username, old_tags=thought.tags,
                                     new_tags=new_thought.tags)
             new_thought.save()
+            index_operation.delay(new_thought, UPDATE)
             recalculate_cloud.delay(request.user.username)
             return HttpResponseRedirect(reverse('list_thoughts'))
     else:
@@ -104,6 +107,7 @@ def delete(request, id):
     if request.method == 'POST':
         remove_tags_signal.send(sender=request.user.username, tags=thought.tags)
         thought.delete()
+        index_operation.delay(thought, DELETE)
         recalculate_cloud.delay(request.user.username)
         params = {'thoughts': Thought.objects.filter(author=request.user.username)}
         template = 'thoughts.html'

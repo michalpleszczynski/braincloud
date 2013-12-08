@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <link href="{{STATIC_URL}}css/login.css" rel="stylesheet">
-    <link href="{{STATIC_URL}}css/main.css" rel="stylesheet">
-    <title>BrainCloud - Hello!</title>
-</head>
-<body>
+{% extends "registration/base.html" %}
+
+{% block title %}Braincloud - Log In{% endblock %}
+
+{% block content %}
 <section id="form_section">
 	<form action="" method="post" id="login_form">
 	{% csrf_token %}
@@ -17,10 +13,9 @@
         <input type="submit" value="login" />
 		<input type="hidden" name="next" value="{{ next|escape }}" />
 	</form>
+    <a href="{% url 'register' %}">Register</a>
     {% if form.errors %}
 		<p class="error">Sorry, that's not a valid username or password.</p>
 	{% endif %}
 </section>
-{% include "includes/footer.html" %}
-</body>
-</html>
+{% endblock %}

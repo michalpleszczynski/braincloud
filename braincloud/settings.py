@@ -21,7 +21,6 @@ connect(DBNAME)
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -176,6 +175,21 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
         'LOCATION': 'cloud_cache',
+    }
+}
+
+# Elasticsearch
+DEFAULT_INDEX = 'braincloud'
+
+#TODO: (maybe) exclude _all and _source from index
+MAPPINGS = {
+    'thought': {
+        'properties': {
+            'title': {'type': 'string'},
+            'content': {'type': 'string'},
+            'pub_date': {'type': 'date'},
+            'tags': {'type': 'string'},
+        }
     }
 }
 

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <link href="{{STATIC_URL}}css/login.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}css/main.css" rel="stylesheet">
+    <title>BrainCloud - Hello!</title>
+    {% block extrahead %}{% endblock %}
+	<title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+{% block content %}{% endblock %}
+</body>
+{% include "includes/footer.html" %}
+</html>

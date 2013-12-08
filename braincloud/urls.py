@@ -16,8 +16,6 @@ rest_api.register(UserResource())
 
 urlpatterns = patterns(
     '',
-    url(r'^home/$', home, name="home"),
-
     # thoughts
     url(r'^thoughts/$', list_thoughts, name="list_thoughts"),
     url(r'^thoughts/(?P<tag>.+)/$', list_thoughts, name="thoughts_by_tag"),
