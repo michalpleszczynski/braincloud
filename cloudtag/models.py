@@ -1,5 +1,5 @@
 # coding: utf-8
-from mongoengine import Document, StringField, ListField, DictField
+from mongoengine import Document, LongField, ListField, DictField
 
 
 class MySortedListField(ListField):
@@ -23,7 +23,7 @@ class MySortedListField(ListField):
 
 
 class UserTags(Document):
-    author = StringField(primary_key=True, unique=True)
+    author_id = LongField(primary_key=True, unique=True)
     tags = MySortedListField(DictField(), ordering=lambda d: d.values(), reverse=True)
 
     def __unicode__(self):

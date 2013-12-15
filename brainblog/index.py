@@ -2,12 +2,9 @@
 import logging
 import json
 
-from django.conf import settings
-
 from elasticsearch.client import IndicesClient
 
 from brainblog import get_es
-from .models import ThoughtEncoder
 
 
 logger = logging.getLogger(__name__)
@@ -16,33 +13,71 @@ logger = logging.getLogger(__name__)
 #operation types
 CREATE, UPDATE, DELETE = 1, 2, 3
 
+#TODO: (maybe) exclude _all and _source from index
+MAPPINGS = {
+    'thought': {
+        'properties': {
+            'title': {'type': 'string'},
+            'content': {'type': 'string'},
+            'pub_date': {'type': 'date'},
+            'tags': {'type': 'string'},
+        }
+    }
+}
+
+TEXT_QUERY = {
+    'query': {
+        'match_phrase_prefix': {
+            '_all': ''
+        }
+    }
+}
+
+
+def _search_phrase(phrase):
+    query = TEXT_QUERY.copy()
+    query['query']['match_phrase_prefix']['_all'] = phrase
+    return json.dumps(query)
+
 
 def create_index(name):
     es = get_es()
     ic = IndicesClient(es)
-    body = {'mappings': settings.MAPPINGS}
+    body = {'mappings': MAPPINGS}
     resp = ic.create(name, json.dumps(body))
-    logger.info(resp)
+    logger.debug('index create: ' + str(resp))
 
 
 def create_thought(thought):
     es = get_es()
-    username = thought.author
+    user_id = thought.author_id
+    from .models import ThoughtEncoder
     thought_json = json.dumps(thought, cls=ThoughtEncoder)
-    resp = es.create(index=username, doc_type='thought', id=str(thought.id), body=thought_json)
-    logger.info(resp)
+    resp = es.create(index=user_id, doc_type='thought', id=str(thought.id), body=thought_json)
+    logger.debug('thought create: ' + str(resp))
 
 
 def update_thought(thought):
     es = get_es()
-    username = thought.author
+    user_id = thought.author_id
     # perform upsert
     body = {'doc': thought.to_dict(), 'doc_as_upsert': 'true'}
-    resp = es.update(index=username, doc_type='thought', id=str(thought.id), body=json.dumps(body))
-    logger.info(resp)
+    resp = es.update(index=user_id, doc_type='thought', id=str(thought.id), body=json.dumps(body))
+    logger.debug('update thought: ' + str(resp))
 
 
 def delete_thought(thought):
     es = get_es()
-    resp = es.delete(index=thought.author, doc_type='thought', id=str(thought.id))
-    logger.info(resp)
+    resp = es.delete(index=thought.author_id, doc_type='thought', id=str(thought.id))
+    logger.debug('delete thought: ' + str(resp))
+
+
+def search_by_phrase(user_id, phrase):
+    logger.debug('index search by phrase: ' + phrase)
+    es = get_es()
+    body = _search_phrase(phrase)
+    resp = es.search(index=user_id, doc_type='thought', body=body, _source=False, fields='_id')
+    ids = []
+    for item in resp['hits']['hits']:
+        ids.append(item['_id'])
+    return ids

@@ -9,8 +9,8 @@ from .models import UserTags
 logger = logging.getLogger(__name__)
 
 
-def add_tags(username, tags):
-    user_tags, created = UserTags.objects.get_or_create(author = username)
+def add_tags(user_id, tags):
+    user_tags, created = UserTags.objects.get_or_create(author_id = user_id)
     # if single string than make it a list to have the same logic for both
     if not is_collection(tags):
         tags = [tags]
@@ -25,8 +25,8 @@ def add_tags(username, tags):
     user_tags.save()
 
 
-def remove_tags(username, tags):
-    user_tags = UserTags.objects.get(author = username)
+def remove_tags(user_id, tags):
+    user_tags = UserTags.objects.get(author = user_id)
     if not is_collection(tags):
         tags = [tags]
     # see add_tags
@@ -39,7 +39,7 @@ def remove_tags(username, tags):
     user_tags.save()
 
 
-def update_tags(username, old_tags, new_tags):
+def update_tags(user_id, old_tags, new_tags):
     if old_tags == new_tags:
         return
     # extract common tags
@@ -49,8 +49,8 @@ def update_tags(username, old_tags, new_tags):
     old_tags -= common
 
     # add new and remove old
-    add_tags(username, only_new_tags)
-    remove_tags(username, old_tags)
+    add_tags(user_id, only_new_tags)
+    remove_tags(user_id, old_tags)
 
 
 def calculate_sizes(tag_dict, threshold, min_size, max_size):

@@ -1,14 +1,15 @@
 import datetime
-import logging
 
 from django.contrib.sessions.models import Session
 
 from celery import task
+from celery.utils.log import get_task_logger
+
 
 from .index import create_thought, update_thought, delete_thought, CREATE, UPDATE, DELETE
 
 
-logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__)
 
 
 @task(ignore_result = True)

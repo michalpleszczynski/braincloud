@@ -12,7 +12,7 @@ from django.conf import settings
 class Command(BaseCommand):
     help = 'Generates test data for brainblog.'
 
-    AUTHORS = ['michau']
+    AUTHORS = {1: 'michau'}
 
     MIN_TITLE = 5
     MAX_TITLE = 60
@@ -44,22 +44,23 @@ class Command(BaseCommand):
         self.stdout.write("Generating %d entries.\n" % self._number)
         for i in range(self._number):
             thought = {
-                'author': random.choice(self.AUTHORS),
+                'author_id': random.choice(self.AUTHORS.keys()),
                 'title': self._get_random_text(random.randint(self.MIN_TITLE, self.MAX_TITLE)),
                 'content': self._get_random_text(random.randint(self.MIN_CONTENT, self.MAX_CONTENT)),
                 'last_update': datetime.datetime.now(),
                 'tags': self._get_random_tags(random.randint(self.MIN_TAG, self.MAX_TAG)),
             }
-            if thought['author'] not in user_tags:
-                user_tags[thought['author']] = []
+            thought.update({'author': self.AUTHORS[thought['author_id']]})
+            if thought['author_id'] not in user_tags:
+                user_tags[thought['author_id']] = []
                 index = []
             for tag in thought['tags']:
                 if tag not in index:
-                    user_tags[thought['author']].append({tag: 1})
+                    user_tags[thought['author_id']].append({tag: 1})
                     index.append(tag)
                 else:
                     i = index.index(tag)
-                    user_tags[thought['author']][i][tag] += 1
+                    user_tags[thought['author_id']][i][tag] += 1
             thoughts.append(thought)
 
         user_tags_ext = []

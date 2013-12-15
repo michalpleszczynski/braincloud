@@ -23,3 +23,7 @@ class ThoughtForm(Form):
 
 class UserRegistrationForm(UserCreationForm):
     email = EmailField()
+
+
+class SearchForm(Form):
+    query = CharField(max_length = 120)

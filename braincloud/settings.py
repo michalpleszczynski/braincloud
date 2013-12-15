@@ -181,18 +181,6 @@ CACHES = {
 # Elasticsearch
 DEFAULT_INDEX = 'braincloud'
 
-#TODO: (maybe) exclude _all and _source from index
-MAPPINGS = {
-    'thought': {
-        'properties': {
-            'title': {'type': 'string'},
-            'content': {'type': 'string'},
-            'pub_date': {'type': 'date'},
-            'tags': {'type': 'string'},
-        }
-    }
-}
-
 import djcelery
 djcelery.setup_loader()
 BROKER_URL = 'django://'
