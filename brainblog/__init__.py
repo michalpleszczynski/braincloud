@@ -1,6 +1,8 @@
 from elasticsearch import Elasticsearch
 
-DEFAULT_URLS = ['127.0.0.1:9200']
+from django.conf import settings
+
+DEFAULT_URLS = [settings.ELASTICSEARCH_URL]
 DEFAULT_TIMEOUT = 5
 
 """

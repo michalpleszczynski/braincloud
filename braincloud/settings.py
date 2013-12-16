@@ -180,6 +180,7 @@ CACHES = {
 
 # Elasticsearch
 DEFAULT_INDEX = 'braincloud'
+ELASTICSEARCH_URL = '127.0.0.1:9200'
 
 import djcelery
 djcelery.setup_loader()

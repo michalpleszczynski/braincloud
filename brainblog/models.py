@@ -62,7 +62,7 @@ class Thought(Document):
 
     @classmethod
     def post_save(cls, sender, document, **kwargs):
-        logger.debug("Post save: %s" % document.name)
+        logger.debug("Post save: %s" % document.id)
         # add new thought to index, or update existing
         index_operation.delay(document, UPDATE)
         # recalculate cloudtag
@@ -70,7 +70,7 @@ class Thought(Document):
 
     @classmethod
     def post_delete(cls, sender, document, **kwargs):
-        logger.debug("Post delete: %s" % document.name)
+        logger.debug("Post delete: %s" % document.id)
         index_operation.delay(document, DELETE)
         recalculate_cloud.delay(document.author_id)
 

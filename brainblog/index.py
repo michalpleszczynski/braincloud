@@ -48,6 +48,13 @@ def create_index(name):
     logger.debug('index create: ' + str(resp))
 
 
+def delete_index(name):
+    es = get_es()
+    ic = IndicesClient(es)
+    resp = ic.delete(name)
+    logger.debug('index delete: ' + str(resp))
+
+
 def create_thought(thought):
     es = get_es()
     user_id = thought.author_id

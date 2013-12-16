@@ -13,8 +13,7 @@ from cloudtag.tasks import recalculate_cloud
 from cloudtag.signals import add_tags_signal, remove_tags_signal, update_tags_signal
 from .forms import ThoughtForm, UserRegistrationForm, SearchForm
 from .models import Thought
-from .tasks import index_operation
-from .index import CREATE, UPDATE, DELETE, search_by_phrase
+from .index import search_by_phrase
 
 
 logger = logging.getLogger(__name__)
