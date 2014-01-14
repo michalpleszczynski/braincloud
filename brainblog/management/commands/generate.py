@@ -1,12 +1,12 @@
 import os
 import random
-import datetime
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from pymongo import MongoClient
 
-from django.conf import settings
+from common.utils import utcnow
 
 
 class Command(BaseCommand):
@@ -44,10 +44,10 @@ class Command(BaseCommand):
         self.stdout.write("Generating %d entries.\n" % self._number)
         for i in range(self._number):
             thought = {
-                'author_id': random.choice(self.AUTHORS.keys()),
+                'author_id': long(random.choice(self.AUTHORS.keys())),
                 'title': self._get_random_text(random.randint(self.MIN_TITLE, self.MAX_TITLE)),
                 'content': self._get_random_text(random.randint(self.MIN_CONTENT, self.MAX_CONTENT)),
-                'last_update': datetime.datetime.now(),
+                'last_update': utcnow(),
                 'tags': self._get_random_tags(random.randint(self.MIN_TAG, self.MAX_TAG)),
             }
             thought.update({'author': self.AUTHORS[thought['author_id']]})
@@ -75,10 +75,10 @@ class Command(BaseCommand):
         db = client[settings.DBNAME]
         if self._cleanup:
             self.stdout.write("Performing cleanup.\n")
-            db.thought.remove()
+            db.text_thought.remove()
             db.user_tags.remove()
-        self.stdout.write("Saving %d thoughts and %s and tag entries to db.\n" % (len(thoughts), len(user_tags_ext)))
-        db.thought.insert(thoughts)
+        self.stdout.write("Saving %d thoughts and %s tag entries to db.\n" % (len(thoughts), len(user_tags_ext)))
+        db.text_thought.insert(thoughts)
         db.user_tags.insert(user_tags_ext)
         client.close()
 

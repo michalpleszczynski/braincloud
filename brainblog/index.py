@@ -15,7 +15,7 @@ CREATE, UPDATE, DELETE = 1, 2, 3
 
 #TODO: (maybe) exclude _all and _source from index
 MAPPINGS = {
-    'thought': {
+    'text_thought': {
         'properties': {
             'title': {'type': 'string'},
             'content': {'type': 'string'},
@@ -58,9 +58,9 @@ def delete_index(name):
 def create_thought(thought):
     es = get_es()
     user_id = thought.author_id
-    from .models import ThoughtEncoder
-    thought_json = json.dumps(thought, cls=ThoughtEncoder)
-    resp = es.create(index=user_id, doc_type='thought', id=str(thought.id), body=thought_json)
+    from .models import TextThoughtEncoder
+    thought_json = json.dumps(thought, cls=TextThoughtEncoder)
+    resp = es.create(index=user_id, doc_type='text_thought', id=str(thought.id), body=thought_json)
     logger.debug('thought create: ' + str(resp))
 
 
@@ -69,13 +69,13 @@ def update_thought(thought):
     user_id = thought.author_id
     # perform upsert
     body = {'doc': thought.to_dict(), 'doc_as_upsert': 'true'}
-    resp = es.update(index=user_id, doc_type='thought', id=str(thought.id), body=json.dumps(body))
+    resp = es.update(index=user_id, doc_type='text_thought', id=str(thought.id), body=json.dumps(body))
     logger.debug('update thought: ' + str(resp))
 
 
 def delete_thought(thought):
     es = get_es()
-    resp = es.delete(index=thought.author_id, doc_type='thought', id=str(thought.id))
+    resp = es.delete(index=thought.author_id, doc_type='text_thought', id=str(thought.id))
     logger.debug('delete thought: ' + str(resp))
 
 
@@ -83,7 +83,7 @@ def search_by_phrase(user_id, phrase):
     logger.debug('index search by phrase: ' + phrase)
     es = get_es()
     body = _search_phrase(phrase)
-    resp = es.search(index=user_id, doc_type='thought', body=body, _source=False, fields='_id')
+    resp = es.search(index=user_id, doc_type='text_thought', body=body, fields='_id')
     ids = []
     for item in resp['hits']['hits']:
         ids.append(item['_id'])

@@ -1,12 +1,11 @@
 import json
 import logging
-
-from django.utils import timezone
+from abc import abstractmethod
 
 from mongoengine import Document, ListField, StringField, DateTimeField, LongField
 from mongoengine import signals
 
-from common.utils import timestamp
+from common.utils import timestamp, utcnow
 from cloudtag.tasks import recalculate_cloud
 from .index import DELETE, UPDATE
 from .tasks import index_operation
@@ -31,20 +30,13 @@ class SetField(ListField):
             self.error('Only sets may be used.')
 
 
-class Thought(Document):
+class BaseThought(Document):
     author = StringField()
     author_id = LongField()
     title = StringField(max_length = 60, required = True)
-    content = StringField(max_length = 1000, required = True)
     last_update = DateTimeField(required = True)
-    pub_date = DateTimeField(required = True)
     tags = SetField(StringField(max_length = 30))
-
-    def save(self, force_insert=False, validate=True, clean=True,
-             write_concern=None, cascade=None, cascade_kwargs=None,
-             _refs=None, **kwargs):
-        self.last_update = timezone.now()
-        super(Thought, self).save(force_insert, validate, clean, write_concern, cascade, cascade_kwargs, _refs, **kwargs)
+    meta = {'abstract': True}
 
     def get_tags_as_string(self):
         return ', '.join(self.tags)
@@ -52,13 +44,28 @@ class Thought(Document):
     def __unicode__(self):
         return "%s by %s" % (self.title, self.author)
 
+    @abstractmethod
     def to_dict(self):
         return {
             'title': self.title,
-            'content': self.content,
-            'pub_date': timestamp(self.pub_date),
+            'pub_date': timestamp(self.id.generation_time),
             'tags': list(self.tags),
         }
+
+
+class TextThought(BaseThought):
+    content = StringField(max_length = 1000, required = True)
+
+    def save(self, force_insert=False, validate=True, clean=True,
+             write_concern=None, cascade=None, cascade_kwargs=None,
+             _refs=None, **kwargs):
+        self.last_update = utcnow()
+        super(TextThought, self).save(force_insert, validate, clean, write_concern, cascade, cascade_kwargs, _refs, **kwargs)
+
+    def to_dict(self):
+        s = super(TextThought, self).to_dict()
+        s.update({'content': self.content})
+        return s
 
     @classmethod
     def post_save(cls, sender, document, **kwargs):
@@ -75,13 +82,13 @@ class Thought(Document):
         recalculate_cloud.delay(document.author_id)
 
 
-signals.post_save.connect(Thought.post_save, sender=Thought)
-signals.post_delete.connect(Thought.post_delete, sender=Thought)
+signals.post_save.connect(TextThought.post_save, sender=TextThought)
+signals.post_delete.connect(TextThought.post_delete, sender=TextThought)
 
 
-class ThoughtEncoder(json.JSONEncoder):
+class TextThoughtEncoder(json.JSONEncoder):
 
     def default(self, obj):
-        if isinstance(obj, Thought):
+        if isinstance(obj, TextThought):
             return obj.to_dict()
         return json.JSONEncoder.default(self, obj)

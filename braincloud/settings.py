@@ -199,4 +199,8 @@ SHELL_PLUS_PRE_IMPORTS = (
     ('cloudtag.models', '*'),
 )
 
-from conf.local_settings import *
+# import local settings
+import platform
+local_settings = '%s/%s.py' % (BASE_DIR, 'braincloud/conf/settings-%s' % platform.node().replace('.', '_'))
+execfile(local_settings)
+

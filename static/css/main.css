@@ -1,3 +1,11 @@
+html {
+    background: url(../images/login_page_background.png) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
 span {
     display: block;
 }
@@ -6,14 +14,60 @@ a {
     text-decoration: none;
 }
 
-nav#user_navigation{
-	background-color: red;
+label, p{
+    font-family: 'Myriad Pro', sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #262B29;
 }
 
-section#top_user_section{
-	float: right;
+input {
+    line-height: 16px;
+    margin: 10px 0;
+    padding: 6px 15px;
+    border: 0;
+    outline: none;
+
+    font-family: Helvetica, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #262B29;
+    text-shadow: 0px 1px 1px rgba(255,255,255, .2);
+
+    -webkit-border-radius: 26px;
+    -moz-border-radius: 26px;
+    border-radius: 26px;
+
+    -webkit-transition: all .15s ease-in-out;
+    -moz-transition: all .15s ease-in-out;
+    -o-transition: all .15s ease-in-out;
+    transition: all .15s ease-in-out;
+
+    -webkit-box-shadow: inset 1px 1px 1px 0px rgba(255,255,255, .45), 0px 1px 1px 0px rgba(0,0,0, .3);
+    -moz-box-shadow: inset 1px 1px 1px 0px rgba(255,255,255, .45), 0px 1px 1px 0px rgba(0,0,0, .3);
+    box-shadow: inset 1px 1px 1px 0px rgba(255,255,255, .45), 0px 1px 1px 0px rgba(0,0,0, .3);
 }
 
-.underline{
+input[type=submit],
+input[type=checkbox]{
+    cursor: pointer;
+}
+
+#top_logo {
+    position: absolute;
+    left: 50%;
+    top: 30px;
+    margin-left: -175px;
+    z-index: 100;
+}
+
+.underline {
 	text-decoration: underline;
+}
+
+.error {
+    font-family: 'Myriad Pro', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: red;
 }

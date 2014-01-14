@@ -8,7 +8,7 @@ DATABASES = {
     },
 }
 
-MONGODB = 'braincloud_mongo_test'
+TEST_MONGODB = 'braincloud_mongo_test'
 
 # tests run a lot faster by using this algorithm
 PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher',)

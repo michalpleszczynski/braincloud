@@ -1,0 +1,12 @@
+#registration_form_section {
+    background: url(../images/login_form_background.png) no-repeat center center;
+    position: relative;
+    width: 250px;
+    margin: 150px auto;
+    overflow: auto;
+}
+
+#registration_form input[type=submit] {
+    position: relative;
+    float: right;
+}

@@ -1,4 +1,7 @@
+import datetime
 import time
+
+from pytz import utc
 
 from collections import Iterable
 
@@ -15,3 +18,7 @@ def timestamp(val=None):
         return int(time.time())
     else:
         return int(time.mktime(val.timetuple()))
+
+
+def utcnow():
+    return datetime.datetime.utcnow().replace(tzinfo=utc)

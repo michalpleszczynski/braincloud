@@ -1,9 +1,15 @@
 {% extends "registration/base.html" %}
 
+{% block extrahead %}<link href="{{STATIC_URL}}css/login.css" rel="stylesheet">{% endblock %}
+
 {% block title %}Braincloud - Log In{% endblock %}
 
 {% block content %}
-<section id="form_section">
+<img src="{{STATIC_URL}}images/logo_white.png" alt="BrainCloud" id="top_logo">
+<section id="login_form_section">
+    {% if form.errors %}
+		<p class="error">Sorry, that's not a valid username or password.</p>
+	{% endif %}
 	<form action="" method="post" id="login_form">
 	{% csrf_token %}
 		<input type="text" name="username" placeholder="username" id="username">
@@ -13,9 +19,8 @@
         <input type="submit" value="login" />
 		<input type="hidden" name="next" value="{{ next|escape }}" />
 	</form>
-    <a href="{% url 'register' %}">Register</a>
-    {% if form.errors %}
-		<p class="error">Sorry, that's not a valid username or password.</p>
-	{% endif %}
+    <p id="login_form_bottom">
+        <a href="#">Forgot your password?</a> | <a href="{% url 'register' %}">Sign Up</a>
+    </p>
 </section>
 {% endblock %}

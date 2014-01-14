@@ -1,13 +1,18 @@
 {% extends "registration/base.html" %}
 
-{% block title %}Register{% endblock %}
+{% block extrahead %}<link href="{{STATIC_URL}}css/registration.css" rel="stylesheet">{% endblock %}
+
+{% block title %}Braincloud - Sign Up{% endblock %}
 
 {% block content %}
-	<form action="" method="post">
+<section id="registration_form_section">
+	<form action="" id="registration_form" method="post">
 		{% csrf_token %}
-		<table>
-			{{ registration_form.as_table }}
-		</table>
-		<input type="submit" value="Submit">
+        {{ registration_form.username }}
+        {{ registration_form.password1 }}
+        {{ registration_form.password2 }}
+        {{ registration_form.email }}
+		<input type="submit" value="Go!">
 	</form>
+</section>
 {% endblock %}

@@ -6,13 +6,12 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
-from django.utils import timezone
 
 from cloudtag.models import UserTags
 from cloudtag.tasks import recalculate_cloud
 from cloudtag.signals import add_tags_signal, remove_tags_signal, update_tags_signal
-from .forms import ThoughtForm, UserRegistrationForm, SearchForm
-from .models import Thought
+from .forms import TextThoughtForm, UserRegistrationForm, SearchForm
+from .models import TextThought
 from .index import search_by_phrase
 
 
@@ -38,11 +37,11 @@ def register(request):
 @login_required
 def list_thoughts(request, tag = None):
     if not tag:
-        thoughts = Thought.objects.filter(author_id = request.user.id)
+        thoughts = TextThought.objects.filter(author_id = request.user.id)
     else:
         # workaround for tags with whitespace in them
         tag = tag.replace('/', ' ')
-        thoughts = Thought.objects.filter(author_id = request.user.id, tags__contains = tag)
+        thoughts = TextThought.objects.filter(author_id = request.user.id, tags__contains = tag)
     return render_to_response('thoughts.html', {'thoughts': thoughts},
                               context_instance = RequestContext(request))
 
@@ -54,7 +53,7 @@ def search_thoughts(request):
         if form.is_valid():
             phrase = form.cleaned_data['query']
             ids = search_by_phrase(request.user.id, phrase)
-            thoughts = Thought.objects.filter(id__in=ids)
+            thoughts = TextThought.objects.filter(id__in=ids)
             return render_to_response('search_results.html', {'thoughts': thoughts},
                                       context_instance = RequestContext(request))
     else:
@@ -63,7 +62,7 @@ def search_thoughts(request):
 
 @login_required
 def view_thought(request, id):
-    thought = Thought.objects.get(id=id)
+    thought = TextThought.objects.get(id=id)
 
     return render_to_response('view_thought.html', {'thought': thought},
                               context_instance = RequestContext(request))
@@ -72,32 +71,30 @@ def view_thought(request, id):
 @login_required
 def add(request):
     if request.method == 'POST':
-        form = ThoughtForm(request.POST)
+        form = TextThoughtForm(request.POST)
         if form.is_valid():
             new_thought = form.get_thought()
             new_thought.author = request.user.username
             new_thought.author_id = request.user.id
-            new_thought.pub_date = timezone.now()
             add_tags_signal.send(sender=request.user.id, tags=new_thought.tags)
             new_thought.save()
             return HttpResponseRedirect(reverse('list_thoughts'))
     else:
-        form = ThoughtForm()
+        form = TextThoughtForm()
     return render_to_response('add.html', {'thought_form': form},
                               context_instance = RequestContext(request))
 
 
 @login_required
 def edit(request, id):
-    thought = Thought.objects.get(id=id)
+    thought = TextThought.objects.get(id=id)
 
     if request.method == 'POST':
-        form = ThoughtForm(request.POST)
+        form = TextThoughtForm(request.POST)
         if form.is_valid():
             # update field values and save to mongo
             new_thought = form.get_thought()
             new_thought.id = thought.id
-            new_thought.pub_date = thought.pub_date
             new_thought.author = request.user.username
             new_thought.author_id = request.user.id
             update_tags_signal.send(sender=request.user.id, old_tags=thought.tags,
@@ -105,7 +102,7 @@ def edit(request, id):
             new_thought.save()
             return HttpResponseRedirect(reverse('list_thoughts'))
     else:
-        form = ThoughtForm(initial={'title': thought.title, 'content': thought.content,
+        form = TextThoughtForm(initial={'title': thought.title, 'content': thought.content,
                                     'tags': thought.get_tags_as_string()})
     return render_to_response('edit.html', {'thought_form': form},
                               context_instance=RequestContext(request))
@@ -113,12 +110,12 @@ def edit(request, id):
 
 @login_required
 def delete(request, id):
-    thought = Thought.objects.get(id=id)
+    thought = TextThought.objects.get(id=id)
 
     if request.method == 'POST':
         remove_tags_signal.send(sender=request.user.id, tags=thought.tags)
         thought.delete()
-        params = {'thoughts': Thought.objects.filter(author_id=request.user.id)}
+        params = {'thoughts': TextThought.objects.filter(author_id=request.user.id)}
         template = 'thoughts.html'
     elif request.method == 'GET':
         params = {}
