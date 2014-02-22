@@ -2,4 +2,4 @@
 *.pot
 *.pyc
 *.db
-local_settings.py
+settings-*.py

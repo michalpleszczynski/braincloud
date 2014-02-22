@@ -6,12 +6,14 @@ from tastypie.api import Api
 
 from brainblog.views import *
 from brainblog.api import UserResource
+from brainindex.api import TextThoughtAjaxResource
 
 admin.autodiscover()
 
 # rest api
-rest_api = Api(api_name = 'rest')
+rest_api = Api(api_name = 'v1')
 rest_api.register(UserResource())
+rest_api.register(TextThoughtAjaxResource())
 #rest_api.register(ThoughtResource())
 
 urlpatterns = patterns(

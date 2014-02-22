@@ -2,7 +2,7 @@
 from django.core.management.base import BaseCommand
 
 from brainblog.models import TextThought
-from brainblog.index import update_thought, delete_index
+from ...index import update_thought, delete_index
 
 
 class Command(BaseCommand):

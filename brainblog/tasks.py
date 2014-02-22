@@ -6,7 +6,7 @@ from celery import task
 from celery.utils.log import get_task_logger
 
 
-from .index import create_thought, update_thought, delete_thought, CREATE, UPDATE, DELETE
+from brainindex.index import create_thought, update_thought, delete_thought, CREATE, UPDATE, DELETE
 
 
 logger = get_task_logger(__name__)

@@ -124,14 +124,24 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    'brainblog',
-    'cloudtag',
     'djcelery',
     'kombu.transport.django',
     'tastypie',
+    'tastypie_mongoengine',
     'pagination',
     'django_extensions',
 )
+
+BRAIN_APPS = (
+    'braincloud',
+    'core',
+    'brainblog',
+    'brainindex',
+    'cloudtag',
+    'common',
+)
+
+INSTALLED_APPS += BRAIN_APPS
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -163,12 +173,18 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'braincloud': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        }
     }
 }
+
+# loggers for my apps
+BRAIN_LOGGERS = {}
+for app in BRAIN_APPS:
+    BRAIN_LOGGERS[app] = {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+        'propagate': True,
+    }
+LOGGING['loggers'].update(BRAIN_LOGGERS)
 
 # Caching
 CACHES = {
@@ -181,6 +197,48 @@ CACHES = {
 # Elasticsearch
 DEFAULT_INDEX = 'braincloud'
 ELASTICSEARCH_URL = '127.0.0.1:9200'
+
+DEFAULT_RESULT_SIZE = 50
+SEARCH_BAR_RESULT_SIZE = 5
+
+# INDEX_SETTINGS = {
+#     'settings': {
+#         'index': {
+#             'analysis': {
+#                 'analyzer': {
+#                     'tags_analyzer': {
+#                         'tokenizer': 'tags_pattern_tokenizer'
+#                     }
+#                 },
+#                 'tokenizer': {
+#                     'tags_pattern_tokenizer': {
+#                         'type': 'pattern',
+#                         # tokenize every tag separately
+#                         'pattern': '\\"([^\"]+)\\"',
+#                     }
+#                 }
+#             }
+#         }
+#     }
+# }
+
+#TODO: (maybe) exclude _all and _source from index
+INDEX_MAPPINGS = {
+    'mappings': {
+        'text_thought': {
+            'properties': {
+                'title': {'type': 'string'},
+                'content': {'type': 'string'},
+                'pub_date': {'type': 'date'},
+                'tags': {
+                    # 'search_analyzer': 'tags_analyzer',
+                    # 'index_analyzer': 'tags_analyzer',
+                    'type': 'string'
+                },
+            }
+        }
+    }
+}
 
 import djcelery
 djcelery.setup_loader()

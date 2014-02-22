@@ -2,6 +2,8 @@
 import logging
 import json
 
+from django.conf import settings
+
 from elasticsearch.client import IndicesClient
 
 from brainblog import get_es
@@ -13,37 +15,33 @@ logger = logging.getLogger(__name__)
 #operation types
 CREATE, UPDATE, DELETE = 1, 2, 3
 
-#TODO: (maybe) exclude _all and _source from index
-MAPPINGS = {
-    'text_thought': {
-        'properties': {
-            'title': {'type': 'string'},
-            'content': {'type': 'string'},
-            'pub_date': {'type': 'date'},
-            'tags': {'type': 'string'},
-        }
-    }
-}
-
 TEXT_QUERY = {
     'query': {
-        'match_phrase_prefix': {
-            '_all': ''
-        }
+        'multi_match': {
+
+        },
     }
 }
 
 
-def _search_phrase(phrase):
+def _search_phrase(phrase, fields=['title', 'content', 'tags'], size=settings.DEFAULT_RESULT_SIZE):
     query = TEXT_QUERY.copy()
-    query['query']['match_phrase_prefix']['_all'] = phrase
+    query['size'] = size
+    query['query']['multi_match'].update({
+        'type': 'phrase_prefix',
+        'query': phrase,
+        'fields': fields,
+        'max_expansions': 10,
+    })
     return json.dumps(query)
 
 
 def create_index(name):
     es = get_es()
     ic = IndicesClient(es)
-    body = {'mappings': MAPPINGS}
+    body = {}
+    # body.update(settings.INDEX_SETTINGS)
+    body.update(settings.INDEX_MAPPINGS)
     resp = ic.create(name, json.dumps(body))
     logger.debug('index create: ' + str(resp))
 
@@ -58,7 +56,7 @@ def delete_index(name):
 def create_thought(thought):
     es = get_es()
     user_id = thought.author_id
-    from .models import TextThoughtEncoder
+    from brainblog.models import TextThoughtEncoder
     thought_json = json.dumps(thought, cls=TextThoughtEncoder)
     resp = es.create(index=user_id, doc_type='text_thought', id=str(thought.id), body=thought_json)
     logger.debug('thought create: ' + str(resp))
@@ -88,3 +86,14 @@ def search_by_phrase(user_id, phrase):
     for item in resp['hits']['hits']:
         ids.append(item['_id'])
     return ids
+
+
+def search_in_title_and_tags(user_id, phrase):
+    logger.debug('index search in title and tags by phrase: ' + phrase)
+    es = get_es()
+    body = _search_phrase(phrase, fields=['title', 'tags'], size=settings.SEARCH_BAR_RESULT_SIZE)
+    resp = es.search(index=user_id, doc_type='text_thought', body=body, fields='title')
+    thoughts = []
+    for item in resp['hits']['hits']:
+        thoughts.append({'id': item['_id'], 'title': item['fields']['title']})
+    return {'thoughts': thoughts}

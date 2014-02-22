@@ -10,9 +10,9 @@ from django.core.cache import cache
 from cloudtag.models import UserTags
 from cloudtag.tasks import recalculate_cloud
 from cloudtag.signals import add_tags_signal, remove_tags_signal, update_tags_signal
+from brainindex.index import search_by_phrase
 from .forms import TextThoughtForm, UserRegistrationForm, SearchForm
 from .models import TextThought
-from .index import search_by_phrase
 
 
 logger = logging.getLogger(__name__)
@@ -130,6 +130,7 @@ def cloud(request):
     tag_size_dict = cache.get(str(user_id) + 'tag_size_dict')
     if not tag_size_dict:
         logger.info('tag_size_dict not in cache')
+        # call task as normal function
         tag_size_dict = recalculate_cloud(user_id)
         cache.set(str(user_id) + 'tag_size_dict', tag_size_dict)
     return render_to_response('cloud.html', {'tags': tag_size_dict},

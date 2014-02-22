@@ -7,7 +7,7 @@ from mongoengine import signals
 
 from common.utils import timestamp, utcnow
 from cloudtag.tasks import recalculate_cloud
-from .index import DELETE, UPDATE
+from brainindex.index import DELETE, UPDATE
 from .tasks import index_operation
 
 logger = logging.getLogger(__name__)
