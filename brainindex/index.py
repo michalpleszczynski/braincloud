@@ -96,4 +96,5 @@ def search_in_title_and_tags(user_id, phrase):
     thoughts = []
     for item in resp['hits']['hits']:
         thoughts.append({'id': item['_id'], 'title': item['fields']['title']})
+    logger.debug('found results: %d' % len(thoughts))
     return {'thoughts': thoughts}
