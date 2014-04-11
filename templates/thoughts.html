@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% load pagination_tags %}
-
+{% load staticfiles %}
 {% block extrahead %}
-    <link href="{{STATIC_URL}}css/thought.css" rel="stylesheet">
+    <link href="{% static 'css/thought.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block title %}Your thoughts{% endblock %}
@@ -15,8 +15,8 @@
 	{% for thought in thoughts %}
         <article class="thought_article">
             <h2 class="underline"><a href="{% url 'view_thought' thought.id %}">{{ thought.title }}</a></h2>
-            <a href="{% url 'delete_thought' thought.id %}" class="delete_thought"><img src="{{STATIC_URL}}images/erase.png" alt="Delete thought"></a>
-            <a href="{% url 'edit_thought' thought.id %}" class="edit_thought"><img src="{{STATIC_URL}}images/edit.png" alt="Edit thought"></a>
+            <a href="{% url 'delete_thought' thought.id %}" class="delete_thought"><img src="{% static 'images/erase.png' %}" alt="Delete thought"></a>
+            <a href="{% url 'edit_thought' thought.id %}" class="edit_thought"><img src="{% static 'images/edit.png' %}" alt="Edit thought"></a>
             {% if post.body|wordcount <= 100 %}
                 <p>{{ thought.content }}</p>
             {% else %}

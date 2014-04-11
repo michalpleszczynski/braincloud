@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-
+{% load staticfiles %}
 {% block title %}Your tag cloud{% endblock %}
 
 {% block extrahead %}
-    <link href="{{STATIC_URL}}css/cloud.css" rel="stylesheet">
-    <script src="{{ STATIC_URL }}js/d3-cloud/lib/d3/d3.js"></script>
-    <script src="{{ STATIC_URL }}js/d3-cloud/d3.layout.cloud.js"></script>
+    <link href="{% static 'css/cloud.css' %}" rel="stylesheet">
+    <script src="{% static 'js/d3-cloud/lib/d3/d3.js' %}"></script>
+    <script src="{% static 'js/d3-cloud/d3.layout.cloud.js' %}"></script>
 {% endblock %}
 
 {% block content %}

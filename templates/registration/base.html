@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-    <link href="{{STATIC_URL}}css/main.css" rel="stylesheet">
+    {% load staticfiles %}
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
     <title>BrainCloud - Hello!</title>
     {% block extrahead %}{% endblock %}
 	<title>{% block title %}{% endblock %}</title>

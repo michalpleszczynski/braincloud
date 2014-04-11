@@ -8,10 +8,10 @@ $(document).ready(function(){
             window.location.href = ui.item.value;
         },
         focus: function( event, ui ) {
-            event.preventDefault();
             $("#query").val(ui.item.label);
         },
         minLength: 3,
+        delay: 500,
     });
 
     $("input#query").keyup(function(){
@@ -21,13 +21,13 @@ $(document).ready(function(){
             dataString = 'q=' + query;
             $.ajax({
                 type: "POST",
-                url: "http://127.0.0.1:8000/api/v1/livesearch/",
+                url: "/api/v1/livesearch/",
                 data: dataString,
                 success: function(response){
                     var availableHints = [];
                     for (var i in response.thoughts){
                         availableHints.push({
-                            value: "http://127.0.0.1:8000/view_thought/" + response.thoughts[i].id,
+                            value: "/view_thought/" + response.thoughts[i].id,
                             label: response.thoughts[i].title
                         });
                     }
